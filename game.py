@@ -2,10 +2,13 @@
 from random import randint
 from pygame import *
 from random import randint
+font.init()
 if randint(0,1):
     forward = 1
 else:
     forward = -1
+
+font_s = font.SysFont("Arial", 40)
 
 if randint(0,1):
     gobal = 1
@@ -60,22 +63,21 @@ players.add(second_player)
 class Ball(sprite.Sprite):
     def __init__(self, x, y, speed, radius, disp=okno):
         super().__init__()
-        self.rect = draw.circle(okno, (250, 200, 0), (x,y), radius)
+        self.rect = Rect(x-radius*2, y-radius*2, radius*2, radius*2)
         self.sd_y = speed * gobal
         self.sd_x = speed * forward
         self.disp = disp
         self.radius = radius
-#    def going(self):
+
     def reset_ball(self):
-        
         self.rect.x += self.sd_x
-        self.rect.y += self.sd_y
-        if self.rect.y >= 480 or self.rect.y <=20:
+        self.rect.y+= self.sd_y
+        if self.rect.y >= 440 or self.rect.y <=20:
             self.sd_y *= -1
         if sprite.spritecollide(self,players, False):
             self.sd_x *= -1
-        draw.rect(okno, (0,0,0), self.rect)
-        draw.circle(self.disp, (250, 200, 0), (self.rect.x, self.rect.y), self.radius)
+#        draw.rect(okno, (0,0,0), self.rect)
+        draw.circle(self.disp, (250, 200, 0), self.rect.center, self.radius)
 
 ball = Ball(300, 200, 5, 40)
 
@@ -84,65 +86,40 @@ ball = Ball(300, 200, 5, 40)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 game = True
-
+lose = False
 while game:
-
-    okno.fill(color_disp)
-    ball.reset_ball()
-
-    first_player.rul()
-    second_player.rul(K_w, K_s)
 
     for e in event.get():
         if e.type == QUIT:
             game = False
+
+    okno.fill(color_disp)
+    
+    if not lose:
+
+        okno.fill(color_disp)
+        ball.reset_ball()
+
+        first_player.rul()
+        second_player.rul(K_w, K_s)
+
+
+        
+        if ball.rect.x < 0:
+            lose = True
+            text = font_s.render(
+                "Правый победил", True, (0,0,0)
+            )
+        elif ball.rect.x > 700:
+            lose = True
+            text = font_s.render(
+                "Левый победил", True, (0,0,0)
+            )
+    else:
+        okno.blit(text, (100,100))
+
+
 
 
     clock.tick(FPS)
